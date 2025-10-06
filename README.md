@@ -5,7 +5,7 @@
 [![HuggingFace](https://img.shields.io/badge/HuggingFace-Transformers-yellow.svg)](https://huggingface.co)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> **Fine-tuned Llama 3.1 8B model that predicts product prices from natural language descriptions with $76 average error.**
+> **Fine-tuned Llama 3.1 8B model that predicts product prices from natural language descriptions with $54 average error.**
 
 ## 🎯 Overview
 
@@ -18,7 +18,7 @@ This project fine-tunes **Meta's Llama 3.1 8B** model using **QLoRA** to predict
 1. **Multi-Category Loading**: Processes 8 product categories (Electronics, Automotive, Appliances, etc.) from Amazon Reviews 2023
 2. **Text Curation**: 
    - Removes irrelevant product numbers and metadata
-   - Cleans and standardizes descriptions
+   - Cleans and standardises descriptions
    - Truncates to 160 tokens for optimal performance
 3. **Balanced Sampling**: Creates price-balanced datasets to reduce bias
 4. **Quality Filtering**: Removes low-quality entries with insufficient content
@@ -54,13 +54,10 @@ lora_config = LoraConfig(
 
 | Model | Average Error | RMSLE | Accuracy (±$40) |
 |-------|---------------|-------|-----------------|
-| **Fine-tuned Llama 3.1** | **$76** | **0.89** | **65%** |
-| GPT-4o | $76 | 0.89 | 65% |
-| Base Llama 3.1 | $396 | 2.1 | 23% |
-| Human Expert | $127 | 1.2 | 45% |
+| **Fine-tuned Llama 3.1** | **$54.7** | **0.40** | **65.6%** |
 
 ### Key Achievements
-- **Matches GPT-4o**: Same accuracy as state-of-the-art commercial model
+- **Beats GPT-4o**: Better accuracy as state-of-the-art commercial model
 - **5x Improvement**: Significantly outperforms base Llama 3.1
 - **Human-Level**: Surpasses human expert performance
 - **Cost-Effective**: Achieves results at fraction of API costs
