@@ -1,0 +1,19 @@
+# Base requirements for the Product Pricer project
+# These are the core packages needed for data curation and basic functionality
+
+# Core data and ML packages
+datasets==3.6.0
+matplotlib
+huggingface_hub
+python-dotenv
+
+# Standard library packages (usually included with Python)
+# numpy - for numerical operations
+# pickle - for saving/loading datasets
+# os - for environment variables
+# re - for regular expressions
+# math - for mathematical operations
+# random - for random sampling
+# collections - for Counter, defaultdict
+# datetime - for timestamps
+# typing - for type hints

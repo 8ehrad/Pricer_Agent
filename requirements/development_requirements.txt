@@ -1,0 +1,33 @@
+# Development and optional requirements for the Product Pricer project
+# These packages are useful for development, debugging, and additional features
+
+# Jupyter notebook support
+jupyter
+ipywidgets
+
+# Google Colab specific (if running in Colab)
+# google-colab
+
+# Additional data processing
+pandas
+numpy
+
+# API and web services
+requests
+
+# Environment and configuration
+python-dotenv
+
+# Progress bars and utilities
+tqdm
+
+# Optional: For enhanced visualization
+seaborn
+plotly
+
+# Optional: For data validation
+pydantic
+
+# Optional: For better error handling and logging
+rich
+loguru
