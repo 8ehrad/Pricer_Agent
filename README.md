@@ -4,11 +4,11 @@
 
 This applied machine-learning project uses **QLoRA** to adapt **Llama 3.1 8B** for a specialised numerical prediction task. It covers data curation, parameter-efficient training, inference and held-out evaluation across eight categories from the [Amazon Reviews 2023 dataset](https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023).
 
-**Published notebook result:** **$54.70 mean absolute error** on the first **250** examples from a held-out test split. In a separate comparison I ran for this task, **my fine-tuned Llama outperformed GPT-4o**. That GPT-4o comparison is a reported experiment, not a reproducible result in the published notebooks: its predictions and benchmark scores are not included in this repository.
+On **250 held-out product descriptions**, the fine-tuned model achieved **$54.70 mean absolute error**. I also benchmarked GPT-4o on this pricing task and found that my fine-tuned Llama performed better in that comparison.
 
 ## Results
 
-The figures below come from [evaluation.ipynb](evaluation.ipynb), which evaluates the `improved_model_predict` function on 250 test examples. The metrics were recalculated from the notebook's saved per-example outputs.
+Results from [evaluation.ipynb](evaluation.ipynb), using `improved_model_predict` on 250 held-out examples:
 
 | Metric | Fine-tuned Llama 3.1 8B |
 | --- | ---: |
@@ -17,11 +17,11 @@ The figures below come from [evaluation.ipynb](evaluation.ipynb), which evaluate
 | Absolute error below $40 | **139 / 250 (55.6%)** |
 | Absolute error below $40 **or** relative error below 20% | **164 / 250 (65.6%)** |
 
-**Metric clarification:** The original README called 65.6% "accuracy (±$40)". The evaluation code's green/hit condition is actually **absolute error < $40 OR relative error < 20%**; strictly under $40 is 55.6%. This is a regression task, so the error metrics are more informative than either threshold alone.
+**Prediction accuracy:** 65.6% of predictions had an absolute error below $40 **or** a relative error below 20%. Across the same sample, 55.6% were within $40 alone.
 
-**GPT-4o comparison:** In my own additional experiment on this pricing task, the fine-tuned Llama performed better than GPT-4o. The GPT-4o scores, prompts and per-example outputs are not preserved here, so the comparison should be treated as a **self-reported observation**, not a documented head-to-head benchmark with publicly verifiable conditions. No numerical advantage is asserted.
+**GPT-4o comparison:** My fine-tuned Llama performed better than GPT-4o in a separate benchmark I ran for this task. The GPT-4o predictions and scores are not included in this repository.
 
-These results describe the recorded sample, not expected performance on every retail category or production data. No separate human-expert comparison is provided.
+Results are based on a sample of 250 products; performance can vary by category and price range.
 
 ## Tech stack
 
@@ -50,7 +50,7 @@ These results describe the recorded sample, not expected performance on every re
 
 The pipeline filters missing or out-of-range prices, removes selected noisy metadata and product-number patterns, and requires sufficient textual description length. Retained item text is truncated to approximately **160 tokens** before assembling the prediction prompt. Sampling reduces over-representation of cheap items and Automotive products.
 
-The notebook records a curated sample of **408,635 products**, shuffled and split into **400,000 training examples** and **2,000 held-out test examples**. The recorded evaluation uses the first **250** held-out examples.
+The curated dataset contains **408,635 products**. After shuffling, **400,000 examples** were used for training and **2,000** were reserved for testing. The evaluation results above use the first **250** test examples.
 
 The model is prompted to complete a structured price answer:
 
@@ -80,7 +80,7 @@ Price is $
 | LR schedule | Cosine, 3% warm-up |
 | Maximum sequence length | 182 tokens |
 
-A completion-only data collator trains the model to predict the price response rather than learn to reproduce the entire description. The recorded run uploaded a fine-tuned adapter to a **private** Hugging Face repository. This public repository contains notebooks and scripts, not trained model weights.
+A completion-only data collator focuses the training objective on the price response rather than reproducing the product description. The fine-tuned adapter was uploaded to a **private** Hugging Face repository; the code and notebooks are available here.
 
 ### 3. Evaluate the price estimator
 
@@ -90,7 +90,7 @@ A completion-only data collator trains the model to predict the price response r
 2. `improved_model_predict`, which computes a probability-weighted mean of the top three next-token candidates that can be interpreted as positive numerical prices.
 3. A test harness that records price guesses, actual prices, absolute errors, squared logarithmic errors and a threshold-based classification.
 
-The publicly saved evaluation includes 250 examples, not a comprehensive baseline or category-by-category assessment.
+The next step for evaluation would be to expand the test sample and break down errors by product category.
 
 ## Repository structure
 
@@ -106,7 +106,7 @@ The publicly saved evaluation includes 250 examples, not a comprehensive baselin
 
 ## Getting started
 
-This project was developed as a notebook workflow, including Google Colab GPU usage. Training an 8B model requires significant GPU resources, and Llama model access may require accepting conditions on Hugging Face. The original notebooks' package combinations may need adjustment in newer environments.
+The notebooks were developed using Google Colab and GPU compute. Training requires sufficient GPU memory, Hugging Face access to Llama 3.1 8B, and compatible Python and CUDA dependencies. For newer environments, you may need to adjust the pinned package versions.
 
 ```bash
 git clone https://github.com/8ehrad/Pricer_Agent.git
@@ -125,20 +125,20 @@ Recommended notebook order:
 2. [training.ipynb](training.ipynb): download Llama weights and fine-tune using a GPU.
 3. [evaluation.ipynb](evaluation.ipynb): evaluate the trained adapter (requires access to the private model repository).
 
-This is **not** a claim of one-command reproducibility without the original model permissions, GPU environment and dependencies.
+To reproduce the full evaluation, you will also need access to the fine-tuned adapter hosted privately on Hugging Face.
 
-## Limitations and next steps
+## Future improvements
 
 - **Sample size:** Expand beyond 250 evaluated examples and report per-category error.
-- **Benchmark documentation:** Preserve the GPT-4o benchmark prompts, predictions and scoring script in a future comparison.
+- **Benchmark comparison:** Repeat the GPT-4o comparison with saved prompts, predictions and a shared evaluation script.
 - **Baselines:** Compare with simple category-level and conventional regression baselines to quantify the benefit of fine-tuning.
-- **Prediction format:** Top-three next-token averaging is a task-specific heuristic, not a calibrated regression distribution.
-- **Distribution:** Training data was restricted and deliberately rebalanced; this is not a representative sample of all retail products.
-- **Reproducibility:** Publish an environment recipe with pinned dependencies and deterministic evaluation steps.
+- **Prediction format:** Evaluate numerical generation and alternative aggregation methods against the current top-three next-token approach.
+- **Distribution:** Check performance on natural retail price distributions in addition to the balanced evaluation data.
+- **Reproducibility:** Add a runnable environment configuration and scripted evaluation.
 
 ## Potential applications
 
-This experiment illustrates specialised price estimation from product descriptions for tasks such as catalogue sanity checks, enrichment and anomalous price triage. It is **not** an end-to-end dynamic pricing or financial asset valuation system.
+This approach could be useful for catalogue sanity checks, product-data enrichment and flagging unusually priced listings for further review.
 
 ## Credits
 
